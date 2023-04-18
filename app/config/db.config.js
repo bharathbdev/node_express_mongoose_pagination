@@ -1,3 +1,3 @@
 module.exports = {
-  url: "mongodb://localhost:27018/tutorialsPagination_db"
+  url: "mongodb+srv://bharathbit2015:Thelion7898@cluster0.fujlhkt.mongodb.net/tutorialsPagination_db"
 };

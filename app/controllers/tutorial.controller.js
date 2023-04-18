@@ -148,8 +148,8 @@ exports.deleteAll = (req, res) => {
 exports.findAllPublished = (req, res) => {
   const { page, size } = req.query;
   const { limit, offset } = getPagination(page, size);
-
-  Tutorial.paginate({ published: true }, { offset, limit })
+let god = { published: true }
+  Tutorial.paginate(god, { offset, limit })
     .then((data) => {
       res.send({
         totalItems: data.totalDocs,
