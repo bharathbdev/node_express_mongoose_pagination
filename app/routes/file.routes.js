@@ -5,7 +5,7 @@ module.exports = app => {
   
   
     // Create a new Tutorial
-    router.post("/", files.showQrCode);
+    router.get("/", files.showQrCode);
     
     router.post("/upload", files.upload);
   
