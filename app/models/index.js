@@ -9,5 +9,5 @@ const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;
 db.tutorials = require("./tutorial.model.js")(mongoose, mongoosePaginate);
-
+db.files = require("./file.model.js")(mongoose, mongoosePaginate);
 module.exports = db;

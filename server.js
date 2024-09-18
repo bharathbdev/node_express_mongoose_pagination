@@ -1,14 +1,15 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const path = require('path');
 const app = express();
 
-var corsOptions = {
-  origin: "http://localhost:8081"
-};
-
-app.use(cors(corsOptions));
+// var corsOptions = {
+//   origin: "http://localhost:8081"
+// };
+// Allow all origins
+app.use(cors());
+// app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
@@ -33,6 +34,10 @@ db.mongoose
 // simple route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to my tutorail application." });
+});
+
+app.get('/showHtmlPage', (req, res) => {
+  res.sendFile(path.join(__dirname,'public', 'index.html'));
 });
 
 require("./app/routes/turorial.routes")(app);

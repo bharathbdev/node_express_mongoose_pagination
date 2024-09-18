@@ -24,5 +24,9 @@ module.exports = app => {
   // Delete all Tutorial
   router.delete("/", tutorials.deleteAll);
 
+  router.post("/upload", tutorials.upload);
+  
+  router.post("/showQrCode", tutorials.showQrCode);
+
   app.use("/api/tutorials", router);
 };
