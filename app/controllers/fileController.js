@@ -36,13 +36,55 @@ exports.upload = (req, res) => {
   });
 };
 
+
+
 exports.showQrCode = (req, res) => {
-  console.log("222")
- // const uploadUrl = `${req.protocol}://${req.get('host')}/showHtmlPage`;
- const uploadUrl = 'https://my-browni.onrender.com/showHtmlPage';
+  console.log("222");
+  const uploadUrl = 'https://my-browni.onrender.com/showHtmlPage';
   QRCode.toDataURL(uploadUrl, (err, url) => {
-      if (err) return res.status(500).send('Error generating QR code');
-      res.send(`<img src="${url}" alt="QR Code" />`);
+    if (err) return res.status(500).send('Error generating QR code');
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>QR Code</title>
+        <style>
+          body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+          }
+          .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+          img {
+            max-width: 100%;
+            height: auto;
+          }
+          h1 {
+            color: #333;
+            margin-bottom: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Scan the QR Code</h1>
+          <img src="${url}" alt="QR Code" />
+        </div>
+      </body>
+      </html>
+    `);
   });
 };
 
