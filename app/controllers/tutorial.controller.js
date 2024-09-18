@@ -1,11 +1,6 @@
 const db = require("../models");
 const Tutorial = db.tutorials;
-const File = db.files;
-const multer = require('multer');
-const QRCode = require('qrcode');
-// Multer setup for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage }).single('file');
+
 
 const getPagination = (page, size) => {
   const limit = size ? +size : 3;
@@ -44,35 +39,29 @@ exports.create = (req, res) => {
 
 // Retrieve all Tutorials from the database.
 exports.findAll = (req, res) => {
-  // const { page, size, title } = req.query;
-  // var condition = title
-  //   ? { title: { $regex: new RegExp(title), $options: "i" } }
-  //   : {};
+  const { page, size, title } = req.query;
+  var condition = title
+    ? { title: { $regex: new RegExp(title), $options: "i" } }
+    : {};
 
-  // const { limit, offset } = getPagination(page, size);
+  const { limit, offset } = getPagination(page, size);
 
-  // Tutorial.paginate(condition, { offset, limit })
-  //   .then((data) => {
-  //     res.send({
-  //       totalItems: data.totalDocs,
-  //       tutorials: data.docs,
-  //       totalPages: data.totalPages,
-  //       currentPage: data.page - 1,
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).send({
-  //       message:
-  //         err.message || "Some error occurred while retrieving tutorials.",
-  //     });
-  //   });
-  console.log("222")
- // const uploadUrl = `${req.protocol}://${req.get('host')}/showHtmlPage`;
- const uploadUrl = 'https://my-browni.onrender.com/showHtmlPage';
-  QRCode.toDataURL(uploadUrl, (err, url) => {
-      if (err) return res.status(500).send('Error generating QR code');
-      res.send(`<img src="${url}" alt="QR Code" />`);
-  });
+  Tutorial.paginate(condition, { offset, limit })
+    .then((data) => {
+      res.send({
+        totalItems: data.totalDocs,
+        tutorials: data.docs,
+        totalPages: data.totalPages,
+        currentPage: data.page - 1,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials.",
+      });
+    });
+
 };
 
 // Find a single Tutorial with an id
@@ -178,40 +167,6 @@ let god = { published: true }
     });
 };
 
-// Handle file upload
-exports.upload = (req, res) => {
-  upload(req, res, async function (err) {
-    if (err instanceof multer.MulterError) {
-      return res.status(500).send('Multer error occurred when uploading.');
-    } else if (err) {
-      return res.status(500).send('Unknown error occurred when uploading.');
-    }
 
-    try {
-      console.log("Handling file upload...");
-      console.log(`File received: ${req.file.originalname}`);
-      const file = new File({
-        filename: req.file.originalname,
-        contentType: req.file.mimetype,
-        data: req.file.buffer,
-      });
 
-      await file.save();
-      console.log('File uploaded successfully');
-      res.send('File uploaded successfully');
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      res.status(500).send('Error uploading file');
-    }
-  });
-};
-
-exports.showQrCode = (req, res) => {
-  console.log("222")
-  const uploadUrl = `${req.protocol}://${req.get('host')}/showHtmlPage`;
-  QRCode.toDataURL(uploadUrl, (err, url) => {
-      if (err) return res.status(500).send('Error generating QR code');
-      res.send(`<img src="${url}" alt="QR Code" />`);
-  });
-};
 
