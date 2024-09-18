@@ -5,16 +5,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #0056b3;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: none;
+            z-index: 1000;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .popup img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .custom-file-upload, button {
+                padding: 10px;
+            }
+
+            .popup {
+                width: 90%;
+                max-width: 250px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Scan QR Code to Upload Image</h1>
-    <input type="file" id="fileInput" accept="image/*" />
-    <button onclick="uploadFile()">Upload</button>
+    <div class="container">
+        <h1>Upload Image</h1>
+        <label for="fileInput" class="custom-file-upload" id="fileLabel">Choose File</label>
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFileChange()" />
+        <button onclick="uploadFile()">Upload</button>
+        <div class="message" id="message"></div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <img id="popupImage" src="" alt="Status" />
+        <p id="popupMessage"></p>
+        <button onclick="closePopup()">Close</button>
+    </div>
 
     <script>
+        function handleFileChange() {
+            const fileInput = document.getElementById('fileInput');
+            const fileLabel = document.getElementById('fileLabel');
+
+            if (fileInput.files.length > 0) {
+                fileLabel.style.backgroundColor = '#ccc';
+                fileLabel.style.cursor = 'not-allowed';
+                fileLabel.onclick = (e) => e.preventDefault();
+            }
+        }
+
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
+            const fileLabel = document.getElementById('fileLabel');
+            const messageDiv = document.getElementById('message');
+            const overlay = document.getElementById('overlay');
+            const popup = document.getElementById('popup');
+            const popupImage = document.getElementById('popupImage');
+            const popupMessage = document.getElementById('popupMessage');
+
+            messageDiv.textContent = '';
+
             if (fileInput.files.length === 0) {
                 alert('Please select a file');
                 return;
@@ -31,13 +193,35 @@
                 });
 
                 if (response.ok) {
-                    alert('File uploaded successfully');
+                    popupImage.src = 'https://media.giphy.com/media/111ebonMs90YLu/giphy.gif'; // Success GIF
+                    popupMessage.textContent = 'File uploaded successfully';
+                    popupMessage.style.color = 'green';
                 } else {
-                    alert('Error uploading file');
+                    popupImage.src = 'https://media.giphy.com/media/3o6ZtaO9BZHcOjmErm/giphy.gif'; // Error GIF
+                    popupMessage.textContent = 'Error uploading file';
+                    popupMessage.style.color = 'red';
                 }
             } catch (error) {
-                alert('Error uploading file');
+                popupImage.src = 'https://media.giphy.com/media/3o6ZtaO9BZHcOjmErm/giphy.gif'; // Error GIF
+                popupMessage.textContent = 'Error uploading file';
+                popupMessage.style.color = 'red';
             }
+
+            overlay.style.display = 'block';
+            popup.style.display = 'block';
+
+            // Enable the file input again after upload
+            fileLabel.style.backgroundColor = '#007bff';
+            fileLabel.style.cursor = 'pointer';
+            fileLabel.onclick = null;
+            fileInput.value = ''; // Reset the file input
+        }
+
+        function closePopup() {
+            const overlay = document.getElementById('overlay');
+            const popup = document.getElementById('popup');
+            overlay.style.display = 'none';
+            popup.style.display = 'none';
         }
     </script>
 </body>
